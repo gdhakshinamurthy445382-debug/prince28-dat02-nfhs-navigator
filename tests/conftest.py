@@ -1,71 +1,52 @@
 import pytest
 from fastapi.testclient import TestClient
-from pydantic import ValidationError
 
+from nfhs_navigator.api.deps import check_db, get_repo
 from nfhs_navigator.api.main import create_app
 from nfhs_navigator.config import Settings
 
-
-def test_health_is_ok(client):
-    r = client.get("/health")
-    assert r.status_code == 200
-    assert r.json()["status"] == "ok"
-
-
-def test_ready_when_records_loaded(client):
-    r = client.get("/ready")
-    assert r.status_code == 200
-    assert r.json()["checks"]["records_loaded"] is True
+# Tiny fake records: unit tests never touch a real database or your data file.
+SAMPLE = [
+    {"id": "001", "title": "Alpha guideline", "year": 2023, "kind": "guideline"},
+    {"id": "002", "title": "Beta circular", "year": 2024, "kind": "circular"},
+    {"id": "003", "title": "Gamma notice", "year": 2025, "kind": "circular"},
+]
 
 
-def test_ready_is_503_when_data_file_missing(tmp_path):
-    settings = Settings(app_env="ci", data_file=tmp_path / "missing.json")
-    with TestClient(create_app(settings)) as c:
-        assert c.get("/health").status_code == 200  # alive...
-        assert c.get("/ready").status_code == 503  # ...but not ready
+class FakeRepo:
+    """Behaves like DocumentRepository, but keeps rows in a Python list."""
+
+    def __init__(self, rows):
+        self.rows = rows
+
+    async def list(self, *, q, filters, limit, offset):
+        rows = [
+            r
+            for r in self.rows
+            if (not q or q.lower() in str(r).lower())
+            and all(str(r.get(k)) == v for k, v in filters.items())
+        ]
+        return len(rows), rows[offset : offset + limit]
+
+    async def get(self, external_id):
+        return next((r for r in self.rows if r["id"] == external_id), None)
 
 
-def test_list_documents_paginates(client):
-    r = client.get("/v1/documents", params={"limit": 2})
-    body = r.json()
-    assert r.status_code == 200
-    assert body["total"] == 3
-    assert len(body["items"]) == 2
+@pytest.fixture
+def settings():
+    # _env_file=None: ignore your local .env so tests behave the same everywhere
+    return Settings(app_env="ci", database_url="postgresql://localhost:5432/unused", _env_file=None)
 
 
-def test_search_filters_records(client):
-    r = client.get("/v1/documents", params={"q": "beta"})
-    assert [d["id"] for d in r.json()["items"]] == ["002"]
+@pytest.fixture
+def db_state():
+    return {"up": True}
 
 
-def test_get_document_found(client):
-    r = client.get("/v1/documents/001")
-    assert r.status_code == 200
-    assert r.json()["title"] == "Alpha guideline"
-
-
-def test_missing_document_is_problem_details(client):
-    r = client.get("/v1/documents/999")
-    assert r.status_code == 404
-    assert r.headers["content-type"] == "application/problem+json"
-    body = r.json()
-    assert body["status"] == 404
-    assert body["title"] == "Not Found"
-    assert body["request_id"] == r.headers["X-Request-ID"]
-
-
-def test_bad_limit_is_422_problem(client):
-    r = client.get("/v1/documents", params={"limit": 0})
-    assert r.status_code == 422
-    assert r.json()["errors"][0]["field"] == "query.limit"
-
-
-def test_request_id_is_echoed(client):
-    r = client.get("/health", headers={"X-Request-ID": "abc123"})
-    assert r.headers["X-Request-ID"] == "abc123"
-
-
-def test_app_refuses_to_start_without_app_env(monkeypatch):
-    monkeypatch.delenv("APP_ENV", raising=False)
-    with pytest.raises(ValidationError):
-        Settings(_env_file=None)
+@pytest.fixture
+def client(settings, db_state):
+    app = create_app(settings)
+    app.dependency_overrides[get_repo] = lambda: FakeRepo(SAMPLE)
+    app.dependency_overrides[check_db] = lambda: db_state["up"]
+    with TestClient(app) as c:
+        yield c
