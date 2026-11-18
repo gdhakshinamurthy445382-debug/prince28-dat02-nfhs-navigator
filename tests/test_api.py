@@ -1,216 +1,97 @@
-"""Tests for the NFHS Navigator API."""
-
-import json
-
 import pytest
-from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
-from nfhs_navigator.api.deps import get_indicator_store
-from nfhs_navigator.api.main import create_app
-from nfhs_navigator.indicator_store import IndicatorStore
-
-
-@pytest.fixture
-def client():
-    app = create_app()
-    with TestClient(app) as test_client:
-        yield test_client
+from nfhs_navigator.config import Settings
+from nfhs_navigator.db.url import to_asyncpg_url
 
 
-def test_liveness(client):
-    response = client.get("/health/live")
-
-    assert response.status_code == 200
-    assert response.json() == {"status": "alive"}
-
-
-def test_readiness(client):
-    response = client.get("/health/ready")
-
-    assert response.status_code == 200
-    assert response.json() == {"status": "ready"}
+def test_health_is_ok(client):
+    r = client.get("/health")
+    assert r.status_code == 200
+    assert r.json()["status"] == "ok"
 
 
-def test_list_documents(client):
-    response = client.get("/documents")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["total"] == 20
-    assert len(body["items"]) == 20
+def test_ready_when_database_up(client):
+    r = client.get("/ready")
+    assert r.status_code == 200
+    assert r.json()["checks"]["database"] is True
 
 
-def test_get_document(client):
-    response = client.get("/documents/001")
-
-    assert response.status_code == 200
-    assert response.json()["id"] == "001"
-    assert response.json()["district"] == "Chennai"
+def test_ready_is_503_when_database_down(client, db_state):
+    db_state["up"] = False
+    assert client.get("/health").status_code == 200  # alive...
+    assert client.get("/ready").status_code == 503  # ...but not ready
 
 
-def test_search_documents(client):
-    response = client.get("/documents", params={"q": "Coimbatore"})
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["total"] == 4
-    assert len(body["items"]) == 4
-    assert all(record["district"] == "Coimbatore" for record in body["items"])
+def test_list_documents_paginates(client):
+    body = client.get("/v1/documents", params={"limit": 2}).json()
+    assert body["total"] == 3
+    assert len(body["items"]) == 2
 
 
-def test_document_not_found(client):
-    response = client.get("/documents/INVALID-999")
-
-    assert response.status_code == 404
-    assert response.json()["title"] == "Not Found"
-    assert response.json()["status"] == 404
+def test_search_filters_records(client):
+    r = client.get("/v1/documents", params={"q": "beta"})
+    assert [d["id"] for d in r.json()["items"]] == ["002"]
 
 
-def test_request_id_header(client):
-    response = client.get("/health/live")
-
-    assert response.status_code == 200
-    assert "X-Request-ID" in response.headers
-
-
-@pytest.fixture
-def indicator_client(tmp_path):
-    records = [
-        {
-            "id": "TEST-001",
-            "district": "Chennai",
-            "survey_round": "NFHS-5",
-            "indicator": "child_stunting",
-            "area": "Total",
-            "population_group": "Children under 5",
-            "value": 25.5,
-            "source_document": "Test NFHS-5",
-            "source_table": "Table 10.1",
-            "source_page": "200",
-            "definition": "Children under five who are stunted",
-        },
-        {
-            "id": "TEST-002",
-            "district": "Coimbatore",
-            "survey_round": "NFHS-5",
-            "indicator": "child_stunting",
-            "area": "Urban",
-            "population_group": "Children under 5",
-            "value": 20.0,
-            "source_document": "Test NFHS-5",
-            "source_table": "Table 10.1",
-            "source_page": "201",
-            "definition": "Children under five who are stunted",
-        },
-        {
-            "id": "TEST-003",
-            "district": "Chennai",
-            "survey_round": "NFHS-4",
-            "indicator": "women_anaemia",
-            "area": "Total",
-            "population_group": "Women aged 15-49 years",
-            "value": 55.0,
-            "source_document": "Test NFHS-4",
-            "source_table": "Table 11.1",
-            "source_page": "180",
-            "definition": "Women aged 15-49 years with anaemia",
-        },
-    ]
-
-    path = tmp_path / "indicators.json"
-    path.write_text(json.dumps(records), encoding="utf-8")
-
-    store = IndicatorStore(path)
-    store.load()
-
-    app = create_app()
-    app.dependency_overrides[get_indicator_store] = lambda: store
-
-    with TestClient(app) as test_client:
-        yield test_client
+def test_metadata_filter(client):
+    r = client.get("/v1/documents", params={"kind": "circular"})
+    assert r.json()["total"] == 2
+    assert r.json()["filters"] == {"kind": "circular"}
 
 
-def test_list_indicators(indicator_client):
-    response = indicator_client.get("/indicators")
-
-    assert response.status_code == 200
-    assert len(response.json()) == 3
-
-
-def test_filter_indicators_by_district(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"district": "Chennai"},
-    )
-
-    assert response.status_code == 200
-    assert len(response.json()) == 2
-    assert all(record["district"] == "Chennai" for record in response.json())
+def test_invalid_filter_name_is_400(client):
+    r = client.get("/v1/documents", params={"Bad-Key": "x"})
+    assert r.status_code == 400
+    assert r.headers["content-type"] == "application/problem+json"
 
 
-def test_filter_indicators_by_indicator(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"indicator": "women_anaemia"},
-    )
-
-    assert response.status_code == 200
-    assert len(response.json()) == 1
-    assert response.json()[0]["id"] == "TEST-003"
+def test_get_document_found(client):
+    r = client.get("/v1/documents/001")
+    assert r.status_code == 200
+    assert r.json()["title"] == "Alpha guideline"
 
 
-def test_filter_indicators_by_survey_round(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"survey_round": "NFHS-4"},
-    )
-
-    assert response.status_code == 200
-    assert len(response.json()) == 1
-    assert response.json()[0]["id"] == "TEST-003"
+def test_missing_document_is_problem_details(client):
+    r = client.get("/v1/documents/999")
+    assert r.status_code == 404
+    assert r.headers["content-type"] == "application/problem+json"
+    assert r.json()["request_id"] == r.headers["X-Request-ID"]
 
 
-def test_filter_indicators_by_area(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"area": "Urban"},
-    )
-
-    assert response.status_code == 200
-    assert len(response.json()) == 1
-    assert response.json()[0]["id"] == "TEST-002"
+def test_bad_limit_is_422_problem(client):
+    r = client.get("/v1/documents", params={"limit": 0})
+    assert r.status_code == 422
+    assert r.json()["errors"][0]["field"] == "query.limit"
 
 
-def test_filter_indicators_with_multiple_filters(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={
-            "district": "Chennai",
-            "indicator": "women_anaemia",
-            "survey_round": "NFHS-4",
-            "area": "Total",
-        },
-    )
-
-    assert response.status_code == 200
-    assert len(response.json()) == 1
-    assert response.json()[0]["id"] == "TEST-003"
+def test_request_id_is_echoed(client):
+    r = client.get("/health", headers={"X-Request-ID": "abc123"})
+    assert r.headers["X-Request-ID"] == "abc123"
 
 
-def test_indicator_search_returns_empty_list(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"district": "Madurai"},
-    )
+@pytest.mark.parametrize("missing", ["APP_ENV", "DATABASE_URL"])
+def test_app_refuses_to_start_without_required_settings(monkeypatch, missing):
+    monkeypatch.setenv("APP_ENV", "ci")
+    monkeypatch.setenv("DATABASE_URL", "postgresql://localhost/db")
+    monkeypatch.delenv(missing)
+    with pytest.raises(ValidationError):
+        Settings(_env_file=None)
 
-    assert response.status_code == 200
-    assert response.json() == []
 
-
-def test_indicator_search_rejects_invalid_round(indicator_client):
-    response = indicator_client.get(
-        "/indicators",
-        params={"survey_round": "NFHS-6"},
-    )
-
-    assert response.status_code == 422
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (
+            "postgresql://app@ep-x.neon.tech/neondb?sslmode=require&channel_binding=require",
+            "postgresql+asyncpg://app@ep-x.neon.tech/neondb?ssl=require",
+        ),
+        (
+            "postgresql://postgres@localhost:5432/app?sslmode=disable",
+            "postgresql+asyncpg://postgres@localhost:5432/app",
+        ),
+        ("postgres://app@h/db", "postgresql+asyncpg://app@h/db"),
+    ],
+)
+def test_database_url_is_converted_for_asyncpg(raw, expected):
+    assert to_asyncpg_url(raw) == expected
