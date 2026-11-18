@@ -1,0 +1,203 @@
+
+[
+  {
+    "id": "001",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Chennai",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 20.5
+  },
+  {
+    "id": "002",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 18.2
+  },
+  {
+    "id": "003",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Madurai",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 22.1
+  },
+  {
+    "id": "004",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Salem",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 24.3
+  },
+  {
+    "id": "005",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Tiruchirappalli",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 19.7
+  },
+  {
+    "id": "006",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Chennai",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 55.2
+  },
+  {
+    "id": "007",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 52.8
+  },
+  {
+    "id": "008",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Madurai",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 57.1
+  },
+  {
+    "id": "009",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Salem",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 59.4
+  },
+  {
+    "id": "010",
+    "round": "NFHS-5",
+    "state": "Tamil Nadu",
+    "district": "Tiruchirappalli",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 54.6
+  },
+  {
+    "id": "011",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Chennai",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 23.4
+  },
+  {
+    "id": "012",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 21.6
+  },
+  {
+    "id": "013",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Madurai",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 25.8
+  },
+  {
+    "id": "014",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Salem",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 27.2
+  },
+  {
+    "id": "015",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Tiruchirappalli",
+    "indicator_no": "S01",
+    "indicator": "Child stunting",
+    "area": "Total",
+    "value": 22.5
+  },
+  {
+    "id": "016",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Chennai",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 53.1
+  },
+  {
+    "id": "017",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Coimbatore",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 50.7
+  },
+  {
+    "id": "018",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Madurai",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 55.3
+  },
+  {
+    "id": "019",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Salem",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 57.8
+  },
+  {
+    "id": "020",
+    "round": "NFHS-4",
+    "state": "Tamil Nadu",
+    "district": "Tiruchirappalli",
+    "indicator_no": "W01",
+    "indicator": "Women anaemia",
+    "area": "Total",
+    "value": 52.4
+  }
+]
