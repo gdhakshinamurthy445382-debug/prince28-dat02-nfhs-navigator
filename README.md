@@ -1,9 +1,12 @@
 
 # NFHS Navigator
 
-Answers public-health indicator questions for Tamil Nadu districts using NFHS-5 and NFHS-4 fact sheets and reports, with exact table citations.
+[![CI](https://github.com/gdhakshinamurthy445382-debug/prince28-dat02-nfhs-navigator/actions/workflows/ci.yml/badge.svg)](https://github.com/gdhakshinamurthy445382-debug/prince28-dat02-nfhs-navigator/actions/workflows/ci.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fprince28-dat02-nfhs-navigator.onrender.com%2Fhealth&label=live)](https://prince28-dat02-nfhs-navigator.onrender.com/docs)
 
-**Status:** Day 1 foundation (FastAPI skeleton, quality gates). Live URL from Day 5.
+**Status:** Week 1 complete · live at https://prince28-dat02-nfhs-navigator.onrender.com
+
+**Live:** [API](https://prince28-dat02-nfhs-navigator.onrender.com) · [API docs](https://prince28-dat02-nfhs-navigator.onrender.com/docs) · [Health](https://prince28-dat02-nfhs-navigator.onrender.com/health)
 
 ## Who it's for
 
@@ -11,7 +14,7 @@ District health analyst in the Tamil Nadu health department preparing a review o
 
 ## The problem
 
-Health analysts need to study anaemia and child nutrition across all 38 districts of Tamil Nadu. However, NFHS data is spread across many fact sheets and reports, making it difficult to find the correct information quickly. The same health indicator may have different values for NFHS-4 and NFHS-5, as well as for urban and rural areas. This makes manual comparison difficult and can lead to mistakes when preparing district-level reports.
+Health analysts need to study anaemia and child nutrition across all 38 districts of Tamil Nadu. However, NFHS data is spread across many fact sheets and reports, making it difficult to find the correct information quickly. The same health indicator may have different values for NFHS-4 and NFHS-5, as well as for urban, rural, and total areas. This makes manual comparison difficult and can lead to mistakes when preparing district-level reports.
 
 ## Data sources
 
@@ -41,7 +44,7 @@ cp .env.example .env
 uv run uvicorn nfhs_navigator.api.main:create_app --factory --reload
 ```
 
-Then open http://localhost:8000/docs
+Then open [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ## Checks
 
@@ -49,7 +52,6 @@ Then open http://localhost:8000/docs
 uv run pytest
 uv run ruff check .
 ```
-
 
 ## Run locally in one command
 
@@ -61,9 +63,9 @@ docker compose up --build
 
 This starts Postgres (with pgvector), Redis, runs the migrations and loads the sample data once, then starts the API.
 
-- API docs: http://localhost:8000/docs
-- Liveness: http://localhost:8000/health
-- Readiness (checks the database): http://localhost:8000/ready
+- API docs: [http://localhost:8000/docs](http://localhost:8000/docs)
+- Liveness: [http://localhost:8000/health](http://localhost:8000/health)
+- Readiness (checks the database): [http://localhost:8000/ready](http://localhost:8000/ready)
 
 Stop with `Ctrl+C`, then `docker compose down`. Add `-v` to also delete the database volume.
 
@@ -76,11 +78,3 @@ Stop with `Ctrl+C`, then `docker compose down`. Add `-v` to also delete the data
 | Integration tests (needs `docker compose up`) | `make test-integration` | `uv run poe test-integration` |
 | Coverage report | `make cov` | `uv run poe cov` |
 | Lint and format check | `make lint` | `uv run poe lint` |
-
-
-## Run locally in one command
-
-You need Docker Desktop running. From a fresh clone:
-
-```bash
-docker compose up --build
