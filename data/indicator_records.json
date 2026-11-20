@@ -1,0 +1,16 @@
+[
+    {
+        "id": "TN-CHN-NFHS5-STUNT-TOTAL",
+        "district": "Chennai",
+        "survey_round": "NFHS-5",
+        "indicator": "child_stunting",
+        "area": "Total",
+        "population_group": "Children under 5",
+        "value": 20.5,
+        "unit": "percent",
+        "source_document": "NFHS-5 Sample",
+        "source_table": "Sample table",
+        "source_page": "1",
+        "definition": "Percentage of children under five who are stunted"
+    }
+]
