@@ -17,7 +17,7 @@ on:
 permissions:
   contents: read
 
-concurrency: # never two deploys at once; queue instead of cancelling
+concurrency:
   group: deploy-production
   cancel-in-progress: false
 
@@ -31,11 +31,15 @@ jobs:
     env:
       SHA: ${{ github.event.inputs.sha || github.event.workflow_run.head_sha }}
     steps:
-      # Normal deploy: the merged commit. Rollback: selected commit SHA.
+      # Fetch main and full history first.
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.event.inputs.sha }}
+          ref: main
           fetch-depth: 0
+
+      # Checkout the exact commit to deploy (supports rollback).
+      - name: Checkout deployment commit
+        run: git checkout --detach "${SHA}"
 
       - uses: astral-sh/setup-uv@v10.3.3
         with:
