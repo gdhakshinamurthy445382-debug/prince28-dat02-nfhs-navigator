@@ -1,17 +1,22 @@
 """All settings come from environment variables (or a local .env file)."""
 
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from nfhs_navigator.db.url import to_asyncpg_url
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
     app_name: str = "nfhs_navigator"
     # No defaults on purpose: if these are missing, the app refuses to start (fail fast).
@@ -22,8 +27,12 @@ class Settings(BaseSettings):
     indicator_data_file: Path = Path("data/indicator_records.json")
     db_pool_size: int = 5
     db_max_overflow: int = 5
-    # The commit this image was built from. CI sets it (Dockerfile ARG GIT_SHA); locally "dev".
-    git_sha: str = "dev"
+
+    # Priority:
+    # 1. GIT_SHA (Docker/CI override)
+    # 2. RENDER_GIT_COMMIT (Render native runtime)
+    # 3. dev (local development)
+    git_sha: str = Field(default_factory=lambda: os.getenv("RENDER_GIT_COMMIT", "dev"))
 
     @field_validator("database_url")
     @classmethod
