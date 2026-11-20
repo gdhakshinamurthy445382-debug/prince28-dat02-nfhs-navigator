@@ -54,7 +54,15 @@ def main() -> int:
     # 1) Wait for the NEW version. A free instance may be asleep, and a deploy takes minutes.
     def is_new_version(status, body):
         version = body.get("version") if isinstance(body, dict) else None
-        return status == 200 and args.expect_version in (None, version)
+        return (
+            status == 200
+            and isinstance(version, str)
+            and (
+                args.expect_version is None
+                or version == args.expect_version
+                or version.startswith(args.expect_version)
+            )
+        )
 
     ok, status, body = wait_for(f"{base}/health", is_new_version, deadline, args.interval)
     if not ok:
