@@ -88,8 +88,8 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 
 ## D05 · CI/CD and going live
 
-- Live URL: (paste)
-- CI run for pull request 1: https://github.com/YOUR-GITHUB-USERNAME/prince28-dat02-nfhs-navigator/actions (paste the run link)
+- Live URL: https://prince28-dat02-nfhs-navigator.onrender.com
+- CI run for pull request 1: https://github.com/gdhakshinamurthy445382-debug/prince28-dat02-nfhs-navigator/actions/runs/ (PR #6 — docs/day-05-live)
 - First deploy that ran by itself: (paste the CD run link)
 - Merge clicked at __:__ → "Smoke test passed" at __:__ → lead time: ___ min
 
