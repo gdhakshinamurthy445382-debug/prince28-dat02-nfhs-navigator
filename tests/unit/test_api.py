@@ -9,6 +9,13 @@ def test_health_is_ok(client):
     r = client.get("/health")
     assert r.status_code == 200
     assert r.json()["status"] == "ok"
+    assert r.json()["version"] == "dev"  # no GIT_SHA outside a CI-built image
+
+
+def test_git_sha_comes_from_the_environment(monkeypatch):
+    monkeypatch.setenv("GIT_SHA", "3f2c1ab")
+    settings = Settings(app_env="ci", database_url="postgresql://localhost/db", _env_file=None)
+    assert settings.git_sha == "3f2c1ab"
 
 
 def test_ready_when_database_up(client):
@@ -95,3 +102,21 @@ def test_app_refuses_to_start_without_required_settings(monkeypatch, missing):
 )
 def test_database_url_is_converted_for_asyncpg(raw, expected):
     assert to_asyncpg_url(raw) == expected
+
+
+def test_search_indicators(client):
+    response = client.get(
+        "/v1/indicators",
+        params={
+            "district": "Chennai",
+            "indicator": "child_stunting",
+            "survey_round": "NFHS-5",
+            "area": "Total",
+        },
+    )
+
+    assert response.status_code == 200
+    records = response.json()
+    assert len(records) == 1
+    assert records[0]["id"] == "TN-CHN-NFHS5-STUNT-TOTAL"
+    assert records[0]["district"] == "Chennai"

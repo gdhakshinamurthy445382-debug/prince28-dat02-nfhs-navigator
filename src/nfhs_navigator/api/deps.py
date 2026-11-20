@@ -10,10 +10,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from nfhs_navigator.config import Settings
 from nfhs_navigator.db.repository import DocumentRepository
+from nfhs_navigator.indicator_store import IndicatorStore
 
 
 def get_app_settings(request: Request) -> Settings:
     return request.app.state.settings
+
+
+def get_indicator_store(request: Request) -> IndicatorStore:
+    """Return the application-wide indicator store."""
+    return request.app.state.indicator_store
 
 
 async def get_session(request: Request) -> AsyncIterator[AsyncSession]:

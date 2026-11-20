@@ -148,3 +148,16 @@ def test_reject_non_list_json(tmp_path) -> None:
 
     with pytest.raises(ValueError, match="JSON list"):
         indicator_store.load()
+
+
+def test_load_rejects_non_object_record(tmp_path):
+    path = tmp_path / "records.json"
+    path.write_text('["not an object"]', encoding="utf-8")
+
+    store = IndicatorStore(path)
+
+    with pytest.raises(
+        ValueError,
+        match="Every indicator record must be a JSON object",
+    ):
+        store.load()
