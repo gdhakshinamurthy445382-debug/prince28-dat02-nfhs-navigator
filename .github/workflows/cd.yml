@@ -1,22 +1,26 @@
-# CD: after CI passes on main -> migrate Neon -> deploy that exact image -> smoke test.
-# Rollback: Actions -> CD -> Run workflow -> paste an older commit SHA.
+# CD: CI success on main -> Neon migrations -> deploy exact GHCR image -> smoke test.
+# Manual run: provide a full commit SHA. Manual deployments skip migrations.
+
 name: CD
 
 on:
   workflow_run:
-    workflows: [CI]
+    workflows: ["CI"]
     types: [completed]
     branches: [main]
+
   workflow_dispatch:
     inputs:
       sha:
-        description: "Full commit SHA to deploy (rollback). Migrations are skipped."
+        description: "Full commit SHA to deploy"
         required: true
+        type: string
 
 permissions:
   contents: read
+  packages: read
 
-concurrency:  # never two deploys at once; queue instead of cancelling
+concurrency:
   group: deploy-production
   cancel-in-progress: false
 
@@ -24,21 +28,36 @@ jobs:
   deploy:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+
     environment:
       name: production
       url: ${{ vars.LIVE_URL }}
+
     env:
-      SHA: ${{ github.event.inputs.sha || github.event.workflow_run.head_sha }}
+      SHA: ${{ github.event.workflow_run.head_sha || inputs.sha }}
+
     steps:
-      # Normal deploy: the merged commit. Rollback: today's main (so the newest smoke test runs).
-      - uses: actions/checkout@v7
+      - name: Checkout exact commit
+        uses: actions/checkout@v7
         with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-      - uses: astral-sh/setup-uv@v10
+          ref: ${{ github.event.workflow_run.head_sha || inputs.sha }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.3.3
         with:
           version: "0.11.32"
           enable-cache: true
-      - run: uv sync --locked
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Validate commit SHA
+        run: |
+          if [[ ! "$SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "Error: SHA must be a full 40-character commit hash."
+            echo "Received: $SHA"
+            exit 1
+          fi
 
       - name: Run migrations on Neon (normal deploys only)
         if: github.event_name == 'workflow_run'
@@ -47,14 +66,24 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: uv run alembic upgrade head
 
-      - name: Tell Render to deploy this exact image
+      - name: Deploy exact image to Render
         env:
-          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
           IMAGE="ghcr.io/${GITHUB_REPOSITORY,,}:sha-${SHA}"
-          ENCODED=$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$IMAGE")
-          echo "Deploying $IMAGE"
-          curl --fail --silent --show-error -X POST "${HOOK}&imgURL=${ENCODED}"
 
-      - name: Smoke test the live URL
-        run: uv run python scripts/smoke.py "${{ vars.LIVE_URL }}" --expect-version "${SHA}"
+          if [[ -z "$HOOK" ]]; then
+            echo "Error: RENDER_DEPLOY_HOOK_URL secret is missing."
+            exit 1
+          fi
+
+          echo "Deploying image: $IMAGE"
+
+          curl --fail --silent --show-error \
+            --request POST \
+            --get "$HOOK" \
+            --data-urlencode "imgURL=${IMAGE}"
+
+      - name: Smoke test live URL
+        run: |
+          uv run python scripts/smoke.py "${{ vars.LIVE_URL }}" --expect-version "${SHA}"
