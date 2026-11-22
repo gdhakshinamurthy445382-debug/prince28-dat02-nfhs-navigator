@@ -89,21 +89,23 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 ## D05 · CI/CD and going live
 
 - Live URL: https://prince28-dat02-nfhs-navigator.onrender.com
-- CI run for pull request 1: https://github.com/gdhakshinamurthy445382-debug/prince28-dat02-nfhs-navigator/actions/runs/ (PR #6 — docs/day-05-live)
-- First deploy that ran by itself: (paste the CD run link)
-- Merge clicked at __:__ → "Smoke test passed" at __:__ → lead time: ___ min
+- CI run for pull request 1: https://github.com/gdhakshinamurthy445382-debug/prince28-dat02-nfhs-navigator/actions (PR #6 — docs/day-05-live)
+- First deploy that ran by itself: GitHub Actions CD workflow (exact run link not recorded)
+- Merge clicked at [time not recorded] → "Smoke test passed" at [time not recorded] → lead time: [not recorded]
 
 ### Smoke test output from that CD run
 
 ```text
-paste the last 4 lines of the "Smoke test the live URL" step
+[Exact last 4 lines of the CD smoke-test log not recorded]
 ```
 
 ### Rollback drill
 
-- Rolled back to sha ________ : started __:__, smoke passed __:__ (___ min)
-- Rolled forward to sha ________ : ___ min
-- During the rollback, the database stayed on the newer schema. Why is that safe here? (2 lines)
+- Rolled back to sha a74f43eed680f0cdb4473df5593adea6fab3440c : started [time not recorded], smoke passed [time not recorded] (duration not recorded)
+- Rolled forward to sha 2a35fbe5440465d02d66d8d9ca19557189dd9e69 : 1m 50s
+- During the rollback, the database stayed on the newer schema. Why is that safe here?
+  The rollback deploys an older application commit without downgrading the database.
+  The database schema remains newer, avoiding destructive migrations and preserving data.
 
 ### Where my secrets live
 
@@ -113,4 +115,7 @@ paste the last 4 lines of the "Smoke test the live URL" step
 ### Monitoring
 
 - UptimeRobot checks /health every 5 minutes; alerts go to my email.
-- One thing that would make my live app faster on its first request: (1 line)
+- One thing that would make my live app faster on its first request: Keeping the Render service warm with an always-on instance avoids cold-start delays.
+- Fixed UptimeRobot HEAD check: added explicit HEAD support to /health; production HEAD returns 200 OK.
+- Monitoring status: UP
+- HEAD health fix commit: c91cc0c
