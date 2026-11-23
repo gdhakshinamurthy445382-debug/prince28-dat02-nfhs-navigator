@@ -12,9 +12,9 @@
 
 *- 1 Tamil Nadu state fact sheet*
 
-*- 38 district fact sheets*
+*- 32 survey-era district fact sheets*
 
-*- Total target: 39 documents*
+*- Total target: 33 fact sheets*
 
 
 
@@ -28,27 +28,51 @@
 
 
 
-*No new NFHS source PDFs have been collected in the initial corpus yet.*
+*One NFHS-5 Tamil Nadu state and district fact-sheet compendium*
+
+*has been manually collected and registered.*
 
 
 
-*Therefore:*
+*### Actual measurements*
 
 
 
-*- Measured document count: 0*
+*- Collected PDF documents: 1*
 
-*- Measured total pages: 0*
+*- Fact sheets identified: 33*
 
-*- Measured average pages per document: Not available*
+*- State fact sheets: 1*
 
-*- Actual corpus storage size: Not measured*
+*- District fact sheets: 32*
+
+*- Total PDF pages: 204*
+
+*- Fact-sheet section pages: 198*
+
+*- Front matter pages: 4*
+
+*- Closing pages: 2*
+
+*- File size: 6,779,076 bytes*
+
+*- File size: approximately 6.47 MiB*
+
+*- Average fact-sheet pages: 6*
+
+*- Average storage per fact sheet (rough allocation): approximately 0.196 MiB*
+
+*- SHA-256 verified against the download manifest*
+
+*- Collection method: Manual download*
 
 
 
-*Zero here means no documents collected for this initial corpus yet,*
+*The per-fact-sheet storage value is an allocation estimate based on*
 
-*not that the NFHS source documents contain zero pages.*
+*the complete compendium size. It is not the measured size of an*
+
+*individual fact-sheet PDF.*
 
 
 
@@ -56,9 +80,7 @@
 
 
 
-*Capacity will be estimated using actual downloaded and permitted*
-
-*source documents.*
+*Capacity estimates use actual collected and verified documents.*
 
 
 
@@ -80,13 +102,19 @@
 
 *- SHA-256 hash*
 
+*- Collection method*
+
+*- Licence/reuse status*
 
 
-*Once documents are collected, calculate:*
+
+*Calculate:*
 
 
 
 *- Total document count*
+
+*- Total fact-sheet count*
 
 *- Total page count*
 
@@ -102,21 +130,23 @@
 
 
 
-*The initial target contains 39 fact sheets.*
+*The initial measured baseline is one 204-page compendium containing*
+
+*33 fact sheets and occupying approximately 6.47 MiB.*
 
 
 
-*After collecting and measuring the initial target, use the observed*
+*Use this baseline cautiously when planning expanded NFHS-4 and NFHS-5*
 
-*average page count and average file size to estimate the expanded*
+*corpus storage. Individual documents may vary significantly in page*
 
-*NFHS-4 and NFHS-5 corpus.*
+*count, image resolution, tables, and PDF compression.*
 
 
 
-*The expanded corpus may exceed 10,000 pages. This remains a planning*
+*Expanded corpus estimates remain planning estimates until additional*
 
-*estimate until actual document page counts are measured.*
+*documents are acquired and measured.*
 
 
 
@@ -124,14 +154,12 @@
 
 
 
-*The initial corpus is not yet collected.*
+*- Only one compendium has been collected and measured.*
 
+*- Individual fact-sheet file sizes have not been measured separately.*
 
+*- Expanded NFHS-4/NFHS-5 corpus size is not yet measured.*
 
-*Page counts, file sizes, and storage estimates must not be treated*
+*- Licence and reuse terms remain unverified.*
 
-*as measured values until source files have been collected and inspected.*
-
-
-
-*Source access restrictions and reuse terms must be respected.*
+*- Source access restrictions and reuse terms must be respected.*

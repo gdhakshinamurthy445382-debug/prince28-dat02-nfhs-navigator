@@ -22,10 +22,9 @@
 
 *- Tamil Nadu state fact sheet*
 
-*- 38 district fact sheets*
+- 32 district fact sheets (NFHS-5 survey coverage)
 
-*- Target total: 39 fact sheets*
-
+- Target total: 33 fact sheets
 
 
 *## Source*
@@ -58,23 +57,17 @@
 
 
 
-*## Collection Status*
+## Collection Status
 
-
-
-*- Source portal identified.*
-
-*- Initial corpus target identified.*
-
-*- Automated access may be blocked by the source portal.*
-
-*- Documents will be downloaded manually only where permitted.*
-
-*- No source document URLs have been added to `data/sources.csv` yet.*
-
-*- No new NFHS fact sheets have been collected for this initial corpus.*
-
-
+- Source portal identified (IIPS/NFHS).
+- NFHS-5 Tamil Nadu compendium manually acquired.
+- 1 PDF collected (state + 32 district fact sheets).
+- PDF total pages: 204.
+- Fact sheets identified: 33.
+- Raw source stored in `data/raw/`.
+- SHA-256 recorded in `data/sources/source_manifest.json`.
+- License and reuse terms remain unverified.
+- Additional corpus documents have not yet been collected.
 
 *## Data Integrity*
 

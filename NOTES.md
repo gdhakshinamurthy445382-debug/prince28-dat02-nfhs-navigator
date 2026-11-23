@@ -126,8 +126,8 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 ### Initial corpus target
 
 - NFHS-5 Tamil Nadu state fact sheet
-- 38 district fact sheets
-- Target: 39 documents
+- 32 district fact sheets (survey-era coverage)
+- Target: 33 fact sheets
 
 ### Downloader
 
@@ -141,14 +141,12 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 
 ### Validation
 
-- Unit tests: 31 passed.
-- Full test suite: 49 passed.
+- Full test suite: 51 passed.
 - Ruff checks: passed.
 - Ruff format check: passed.
-- Pre-commit hooks: all passed.
+- Pre-commit hooks: passed.
 - `uv lock --check`: passed.
 - CLI help: verified for `urls` and `manual`.
-- Empty source CSV run: completed safely.
 
 ### Documentation
 
@@ -157,17 +155,23 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 
 ### Collection status
 
-- No source URLs added to `data/sources.csv` yet.
-- No new NFHS PDFs collected.
-- Measured document count: 0.
-- Measured page count: 0.
-- Source portal access restrictions noted.
-- Manual downloading only where permitted; no access restrictions bypassed.
+- Manually acquired NFHS-5 Tamil Nadu State and District Fact Sheets compendium PDF.
+- Source: OpenCity dataset download; original source portal identified as IIPS/NFHS.
+- Raw file: `data/raw/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf`
+- File size: 6,779,076 bytes.
+- SHA-256: `40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a`
+- PDF page count: 204.
+- Fact sheets identified: 33 (1 state + 32 districts).
+- Fact-sheet section: PDF pages 5-202 (198 pages).
+- Front matter: PDF pages 1-4.
+- Closing pages: PDF pages 203-204.
+- License/reuse terms: not yet verified.
+- Source manifest: 1 document recorded.
+- Collection method: manual download.
 
 ### Remaining work
 
-- Verify resumable download behaviour.
-- Add permitted, verified source URLs.
-- Collect the initial corpus.
-- Measure actual PDF page counts and file sizes.
-- Update capacity estimates from measured data.
+- Verify document reuse/licensing terms.
+- Acquire additional permitted NFHS source documents as available.
+- Refine expanded corpus capacity estimates as more documents are collected.
+- Individual fact-sheet PDF sizes have not yet been measured separately.

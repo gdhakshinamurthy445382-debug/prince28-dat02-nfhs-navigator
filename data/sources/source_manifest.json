@@ -10,7 +10,21 @@
     {
       "round": "NFHS-5",
       "period": "2019-21",
-      "documents": []
+      "documents": [
+        {
+          "title": "NFHS-5 Tamil Nadu State and District Fact Sheets Compendium",
+          "organization": "International Institute for Population Sciences (IIPS)",
+          "source_url": "https://data.opencity.in/dataset/ae734771-4981-4031-ac38-7c056aa2c0f0/resource/ba5b1601-1f09-4e4a-8380-10935703a9d6/download/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf",
+          "file_path": "data/raw/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf",
+          "file_size_bytes": 6779076,
+          "page_count": 204,
+          "fact_sheet_count": 33,
+          "sha256": "40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a",
+          "license": "Reuse terms not yet verified",
+          "collection_method": "Manual download",
+          "status": "collected"
+        }
+      ]
     }
   ]
 }
