@@ -119,3 +119,59 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 - Fixed UptimeRobot HEAD check: added explicit HEAD support to /health; production HEAD returns 200 OK.
 - Monitoring status: UP
 - HEAD health fix commit: c91cc0c
+
+
+## D06 - Corpus Collection
+
+### Initial corpus target
+
+- NFHS-5 Tamil Nadu state fact sheet
+- 32 district fact sheets (survey-era coverage)
+- Target: 33 fact sheets
+
+### Downloader
+
+- Implemented URL downloader and manual registration CLI.
+- Robots.txt compliance using Protego.
+- Per-host delay and concurrency controls.
+- Retry and timeout handling.
+- SHA-256 file integrity tracking.
+- Manifest tracking.
+- Temporary `.part` files and atomic file completion.
+
+### Validation
+
+- Full test suite: 51 passed.
+- Ruff checks: passed.
+- Ruff format check: passed.
+- Pre-commit hooks: passed.
+- `uv lock --check`: passed.
+- CLI help: verified for `urls` and `manual`.
+
+### Documentation
+
+- `DATASET.md` created.
+- `docs/CAPACITY.md` created.
+
+### Collection status
+
+- Manually acquired NFHS-5 Tamil Nadu State and District Fact Sheets compendium PDF.
+- Source: OpenCity dataset download; original source portal identified as IIPS/NFHS.
+- Raw file: `data/raw/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf`
+- File size: 6,779,076 bytes.
+- SHA-256: `40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a`
+- PDF page count: 204.
+- Fact sheets identified: 33 (1 state + 32 districts).
+- Fact-sheet section: PDF pages 5-202 (198 pages).
+- Front matter: PDF pages 1-4.
+- Closing pages: PDF pages 203-204.
+- License/reuse terms: not yet verified.
+- Source manifest: 1 document recorded.
+- Collection method: manual download.
+
+### Remaining work
+
+- Verify document reuse/licensing terms.
+- Acquire additional permitted NFHS source documents as available.
+- Refine expanded corpus capacity estimates as more documents are collected.
+- Individual fact-sheet PDF sizes have not yet been measured separately.

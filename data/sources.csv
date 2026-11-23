@@ -1,0 +1,7 @@
+# Sources for NFHS Navigator. One row per file to download.
+# Start target: NFHS-5 Tamil Nadu state + 32 survey-era district fact sheets (33 fact sheets).
+# NFHS source portal: http://rchiips.org/nfhs/
+# Access: Manually downloaded compendium PDF from OpenCity.
+# Reuse/licence terms are not yet verified.
+url,source,licence,title
+https://data.opencity.in/dataset/ae734771-4981-4031-ac38-7c056aa2c0f0/resource/ba5b1601-1f09-4e4a-8380-10935703a9d6/download/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf,IIPS/NFHS via OpenCity,UNVERIFIED,NFHS-5 Tamil Nadu State and District Fact Sheets Compendium
