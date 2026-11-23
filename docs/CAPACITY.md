@@ -156,10 +156,34 @@
 
 *- Only one compendium has been collected and measured.*
 
-*- Individual fact-sheet file sizes have not been measured separately.*
+*- Actual original individual fact-sheet PDF sizes have not been measured; reconstructed extraction sizes are experimental and inflated by duplicated PDF resources.*
 
 *- Expanded NFHS-4/NFHS-5 corpus size is not yet measured.*
 
 *- Licence and reuse terms remain unverified.*
 
 *- Source access restrictions and reuse terms must be respected.*
+
+
+## Experimental Individual Fact-Sheet Extraction
+
+Using pypdf 7.1.1, all 33 six-page fact-sheet sections were reconstructed in memory from the collected 204-page compendium. No individual PDFs were saved and the original PDF was not modified.
+
+### Reconstructed PDF measurements
+
+- Fact sheets reconstructed: 33
+- Minimum reconstructed size: 1,416,968 bytes
+- Maximum reconstructed size: 1,480,499 bytes
+- Mean reconstructed size: 1,419,212.88 bytes
+- Median reconstructed size: 1,417,242 bytes
+- Total reconstructed size: 46,834,025 bytes
+- Original compendium size: 6,779,076 bytes
+- Reconstruction inflation ratio: 6.91x
+
+### Interpretation and limitations
+
+- These are reconstructed PDF sizes, not original individual source-PDF sizes.
+- Reconstructing pages duplicates shared PDF resources, inflating the total to approximately 6.91 times the original compendium size.
+- The measurements must not be used as actual individual-download storage estimates.
+- The original rough allocation of approximately 0.196 MiB per fact sheet remains the baseline storage allocation for this single compendium only.
+- Actual individual fact-sheet file sizes remain unverified.
