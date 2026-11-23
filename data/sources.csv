@@ -1,0 +1,5 @@
+# Sources for NFHS Navigator. One row per file to download.
+# Start target: NFHS-5 Tamil Nadu state + 38 district fact sheets
+# NFHS source portal: http://rchiips.org/nfhs/
+# The source portal blocks bots. PDFs must be downloaded manually if permitted.
+url,source,licence,title

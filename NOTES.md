@@ -119,3 +119,55 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 - Fixed UptimeRobot HEAD check: added explicit HEAD support to /health; production HEAD returns 200 OK.
 - Monitoring status: UP
 - HEAD health fix commit: c91cc0c
+
+
+## D06 - Corpus Collection
+
+### Initial corpus target
+
+- NFHS-5 Tamil Nadu state fact sheet
+- 38 district fact sheets
+- Target: 39 documents
+
+### Downloader
+
+- Implemented URL downloader and manual registration CLI.
+- Robots.txt compliance using Protego.
+- Per-host delay and concurrency controls.
+- Retry and timeout handling.
+- SHA-256 file integrity tracking.
+- Manifest tracking.
+- Temporary `.part` files and atomic file completion.
+
+### Validation
+
+- Unit tests: 31 passed.
+- Full test suite: 49 passed.
+- Ruff checks: passed.
+- Ruff format check: passed.
+- Pre-commit hooks: all passed.
+- `uv lock --check`: passed.
+- CLI help: verified for `urls` and `manual`.
+- Empty source CSV run: completed safely.
+
+### Documentation
+
+- `DATASET.md` created.
+- `docs/CAPACITY.md` created.
+
+### Collection status
+
+- No source URLs added to `data/sources.csv` yet.
+- No new NFHS PDFs collected.
+- Measured document count: 0.
+- Measured page count: 0.
+- Source portal access restrictions noted.
+- Manual downloading only where permitted; no access restrictions bypassed.
+
+### Remaining work
+
+- Verify resumable download behaviour.
+- Add permitted, verified source URLs.
+- Collect the initial corpus.
+- Measure actual PDF page counts and file sizes.
+- Update capacity estimates from measured data.
