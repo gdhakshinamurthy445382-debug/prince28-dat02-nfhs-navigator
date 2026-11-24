@@ -121,13 +121,14 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 - HEAD health fix commit: c91cc0c
 
 
+
 ## D06 - Corpus Collection
 
 ### Initial corpus target
 
-- NFHS-5 Tamil Nadu state fact sheet
-- 32 district fact sheets (survey-era coverage)
-- Target: 33 fact sheets
+- NFHS-5 Tamil Nadu state fact sheet.
+- 32 district fact sheets (survey-era coverage).
+- Target: 33 fact sheets.
 
 ### Downloader
 
@@ -150,28 +151,40 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 
 ### Documentation
 
-- `DATASET.md` created.
+- `DATASET.md` created and updated to reflect current collection status.
 - `docs/CAPACITY.md` created.
+- Historical Tamil Nadu compendium metadata retained in `data/sources/source_manifest.json`.
 
-### Collection status
+### Current collection run
 
-- Manually acquired NFHS-5 Tamil Nadu State and District Fact Sheets compendium PDF.
-- Source: OpenCity dataset download; original source portal identified as IIPS/NFHS.
-- Raw file: `data/raw/994c9ee4-803c-4891-8897-ab4db4a445ff.pdf`
-- File size: 6,779,076 bytes.
-- SHA-256: `40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a`
-- PDF page count: 204.
-- Fact sheets identified: 33 (1 state + 32 districts).
-- Fact-sheet section: PDF pages 5-202 (198 pages).
-- Front matter: PDF pages 1-4.
-- Closing pages: PDF pages 203-204.
-- License/reuse terms: not yet verified.
-- Source manifest: 1 document recorded.
-- Collection method: manual download.
+- NFHS-5 India Report downloaded successfully.
+- NFHS-6 India and State Fact Sheets downloaded successfully.
+- NFHS-5 Himachal Pradesh download blocked by `robots.txt`.
+- Successful downloads: 2 PDFs.
+- Blocked downloads: 1 source.
+- Current local corpus: 2 PDFs in `data/raw/`.
+- Raw PDFs are excluded from version control.
+- Reuse/licensing terms for downloaded documents remain unverified.
+
+### Historical Tamil Nadu compendium record
+
+- Previously recorded as manually acquired from OpenCity.
+- Historical raw filename: `994c9ee4-803c-4891-8897-ab4db4a445ff.pdf`.
+- Historical file size: 6,779,076 bytes.
+- Historical SHA-256: `40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a`.
+- Historical PDF page count: 204.
+- Historical fact sheets identified: 33 (1 state + 32 districts).
+- Fact-sheet section: PDF pages 5–202 (198 pages).
+- Front matter: PDF pages 1–4.
+- Closing pages: PDF pages 203–204.
+- The PDF is currently missing from the local repository.
+- Historical metadata is retained; current status is `missing_local_file`.
+- License/reuse terms remain unverified.
 
 ### Remaining work
 
 - Verify document reuse/licensing terms.
+- Recover the original Tamil Nadu compendium or document its recovery gap.
 - Acquire additional permitted NFHS source documents as available.
 - Refine expanded corpus capacity estimates as more documents are collected.
 - Individual fact-sheet PDF sizes have not yet been measured separately.

@@ -22,7 +22,7 @@
           "sha256": "40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a",
           "license": "Reuse terms not yet verified",
           "collection_method": "Manual download",
-          "status": "collected"
+          "status": "missing_local_file"
         }
       ]
     }

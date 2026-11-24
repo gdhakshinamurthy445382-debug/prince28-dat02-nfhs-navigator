@@ -1,173 +1,95 @@
-*# Corpus Capacity Estimate*
 
+# Corpus Capacity Estimate
 
+## Scope
 
-*## Scope*
+The initial collection target is NFHS-5 Tamil Nadu:
 
+- 1 Tamil Nadu state fact sheet
+- 32 survey-era district fact sheets
+- Total target: 33 fact sheets
 
+The expanded target includes NFHS-4 and NFHS-5 national, state, and district reports and fact sheets.
 
-*The initial collection target is NFHS-5 Tamil Nadu:*
+## Current Measurement Status
 
+The historical Tamil Nadu compendium measurement is retained for planning, but the original PDF is currently missing from the local repository.
 
+### Historical compendium measurements
 
-*- 1 Tamil Nadu state fact sheet*
+- Historical collected PDF documents: 1
+- Fact sheets identified: 33
+- State fact sheets: 1
+- District fact sheets: 32
+- Total PDF pages: 204
+- Fact-sheet section pages: 198
+- Front matter pages: 4
+- Closing pages: 2
+- File size: 6,779,076 bytes
+- File size: approximately 6.47 MiB
+- Average fact-sheet pages: 6
+- Average storage per fact sheet (rough allocation): approximately 0.196 MiB
+- Historical SHA-256: `40cf5c83ddbb053fc8352911fa428101b50c423abc96254989cbd9529ffa398a`
+- Collection method: Manual download
+- Current local availability: Missing
+- Licence/reuse terms: Unverified
 
-*- 32 survey-era district fact sheets*
+The per-fact-sheet storage value is an allocation estimate based on the complete compendium size. It is not the measured size of an individual fact-sheet PDF.
 
-*- Total target: 33 fact sheets*
+## Current Corpus
 
+- NFHS-5 India Report: downloaded
+- NFHS-6 India and State Fact Sheets: downloaded
+- NFHS-5 Himachal Pradesh: blocked by `robots.txt`
+- Successfully downloaded PDFs: 2
+- Current raw corpus storage: 23,261,891 bytes (approximately 22.18 MiB)
+- Raw PDFs are excluded from version control.
+- Licence/reuse terms remain unverified.
 
+## Estimation Method
 
-*The expanded target includes NFHS-4 and NFHS-5 national, state,*
+Capacity estimates use documents that are actually available and measured. Historical measurements are clearly distinguished from current files.
 
-*and district reports and fact sheets.*
+For each document, record:
 
+- Document title
+- Survey round
+- Geography
+- File size in bytes
+- PDF page count
+- Source URL
+- SHA-256 hash
+- Collection method
+- Licence/reuse status
 
+Calculate:
 
-*## Current Measurement Status*
+- Total document count
+- Total fact-sheet count
+- Total page count
+- Average pages per document
+- Total storage size
+- Average storage size per document
 
+## Scaling the Corpus
 
+The historical measured baseline is one 204-page compendium containing 33 fact sheets and occupying approximately 6.47 MiB.
 
-*One NFHS-5 Tamil Nadu state and district fact-sheet compendium*
+Use this baseline cautiously when planning expanded NFHS-4 and NFHS-5 corpus storage. Individual documents may vary significantly in page count, image resolution, tables, and PDF compression.
 
-*has been manually collected and registered.*
+Expanded corpus estimates remain planning estimates until additional documents are acquired and measured.
 
+## Limitations
 
-
-*### Actual measurements*
-
-
-
-*- Collected PDF documents: 1*
-
-*- Fact sheets identified: 33*
-
-*- State fact sheets: 1*
-
-*- District fact sheets: 32*
-
-*- Total PDF pages: 204*
-
-*- Fact-sheet section pages: 198*
-
-*- Front matter pages: 4*
-
-*- Closing pages: 2*
-
-*- File size: 6,779,076 bytes*
-
-*- File size: approximately 6.47 MiB*
-
-*- Average fact-sheet pages: 6*
-
-*- Average storage per fact sheet (rough allocation): approximately 0.196 MiB*
-
-*- SHA-256 verified against the download manifest*
-
-*- Collection method: Manual download*
-
-
-
-*The per-fact-sheet storage value is an allocation estimate based on*
-
-*the complete compendium size. It is not the measured size of an*
-
-*individual fact-sheet PDF.*
-
-
-
-*## Estimation Method*
-
-
-
-*Capacity estimates use actual collected and verified documents.*
-
-
-
-*For each document, record:*
-
-
-
-*- Document title*
-
-*- Survey round*
-
-*- Geography*
-
-*- File size in bytes*
-
-*- PDF page count*
-
-*- Source URL*
-
-*- SHA-256 hash*
-
-*- Collection method*
-
-*- Licence/reuse status*
-
-
-
-*Calculate:*
-
-
-
-*- Total document count*
-
-*- Total fact-sheet count*
-
-*- Total page count*
-
-*- Average pages per document*
-
-*- Total storage size*
-
-*- Average storage size per document*
-
-
-
-*## Scaling the Corpus*
-
-
-
-*The initial measured baseline is one 204-page compendium containing*
-
-*33 fact sheets and occupying approximately 6.47 MiB.*
-
-
-
-*Use this baseline cautiously when planning expanded NFHS-4 and NFHS-5*
-
-*corpus storage. Individual documents may vary significantly in page*
-
-*count, image resolution, tables, and PDF compression.*
-
-
-
-*Expanded corpus estimates remain planning estimates until additional*
-
-*documents are acquired and measured.*
-
-
-
-*## Limitations*
-
-
-
-*- Only one compendium has been collected and measured.*
-
-*- Actual original individual fact-sheet PDF sizes have not been measured; reconstructed extraction sizes are experimental and inflated by duplicated PDF resources.*
-
-*- Expanded NFHS-4/NFHS-5 corpus size is not yet measured.*
-
-*- Licence and reuse terms remain unverified.*
-
-*- Source access restrictions and reuse terms must be respected.*
-
+- The historical Tamil Nadu compendium is currently missing from local storage.
+- Actual original individual fact-sheet PDF sizes have not been measured; reconstructed extraction sizes are experimental and inflated by duplicated PDF resources.
+- Expanded NFHS-4/NFHS-5 corpus size is not yet measured.
+- Licence and reuse terms remain unverified.
+- Source access restrictions and reuse terms must be respected.
 
 ## Experimental Individual Fact-Sheet Extraction
 
-Using pypdf 7.1.1, all 33 six-page fact-sheet sections were reconstructed in memory from the collected 204-page compendium. No individual PDFs were saved and the original PDF was not modified.
+Using pypdf 7.1.1, all 33 six-page fact-sheet sections were reconstructed in memory from the historical 204-page compendium. No individual PDFs were saved and the original PDF was not modified.
 
 ### Reconstructed PDF measurements
 
@@ -185,5 +107,5 @@ Using pypdf 7.1.1, all 33 six-page fact-sheet sections were reconstructed in mem
 - These are reconstructed PDF sizes, not original individual source-PDF sizes.
 - Reconstructing pages duplicates shared PDF resources, inflating the total to approximately 6.91 times the original compendium size.
 - The measurements must not be used as actual individual-download storage estimates.
-- The original rough allocation of approximately 0.196 MiB per fact sheet remains the baseline storage allocation for this single compendium only.
+- The original rough allocation of approximately 0.196 MiB per fact sheet remains a historical baseline allocation for the compendium only.
 - Actual individual fact-sheet file sizes remain unverified.

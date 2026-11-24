@@ -1,108 +1,58 @@
-*# NFHS Navigator Dataset*
 
+# NFHS Navigator Dataset
 
+## Purpose
 
-*## Purpose*
+This dataset supports NFHS Navigator, a project for exploring and understanding indicators from the National Family Health Survey (NFHS).
 
+## Initial Corpus Target
 
+NFHS-5 (2019–21), Tamil Nadu:
 
-*This dataset supports NFHS Navigator, a project for exploring and*
-
-*understanding indicators from the National Family Health Survey (NFHS).*
-
-
-
-*## Initial Corpus Target*
-
-
-
-*NFHS-5 (2019–21), Tamil Nadu:*
-
-
-
-*- Tamil Nadu state fact sheet*
-
+- Tamil Nadu state fact sheet
 - 32 district fact sheets (NFHS-5 survey coverage)
-
 - Target total: 33 fact sheets
 
+## Source
 
-*## Source*
+- Organization: International Institute for Population Sciences (IIPS)
+- Survey: National Family Health Survey (NFHS)
+- Official portal: http://rchiips.org/nfhs/
 
+## License and Terms
 
+Reuse and redistribution terms for each document have not yet been verified.
 
-*- Organization: International Institute for Population Sciences (IIPS)*
-
-*- Survey: National Family Health Survey (NFHS)*
-
-*- Official portal: http://rchiips.org/nfhs/*
-
-
-
-*## License and Terms*
-
-
-
-*Documents are sourced from the official NFHS portal.*
-
-
-
-*The license and reuse terms for each individual document must be*
-
-*verified before downloading, storing, processing, or redistributing it.*
-
-
-
-*No blanket license is assumed for the NFHS documents.*
-
-
+No blanket license is assumed for NFHS documents. Documents must be reviewed for applicable reuse terms before redistribution.
 
 ## Collection Status
 
-- Source portal identified (IIPS/NFHS).
-- NFHS-5 Tamil Nadu compendium manually acquired.
-- 1 PDF collected (state + 32 district fact sheets).
-- PDF total pages: 204.
-- Fact sheets identified: 33.
-- Raw source stored in `data/raw/`.
-- SHA-256 recorded in `data/sources/source_manifest.json`.
-- License and reuse terms remain unverified.
-- Additional corpus documents have not yet been collected.
+- NFHS source portal identified (IIPS/NFHS).
+- The original NFHS-5 Tamil Nadu compendium was previously recorded as manually collected.
+- Historical compendium metadata records 204 pages and 33 fact sheets.
+- The Tamil Nadu compendium PDF is currently missing from the local repository.
+- Its historical SHA-256 and file metadata are retained in `data/sources/source_manifest.json`.
+- NFHS-5 India Report downloaded successfully.
+- NFHS-6 India and State Fact Sheets downloaded successfully.
+- NFHS-5 Himachal Pradesh download was blocked by `robots.txt`.
+- Current local corpus: 2 downloaded PDF documents.
+- Download status, URLs, file paths, hashes, byte sizes, and source metadata are recorded in `data/manifest.jsonl`.
+- Reuse/licensing terms remain unverified for downloaded documents.
+- The NFHS-4 corpus has not been collected.
 
-*## Data Integrity*
+## Data Integrity
 
+- Downloaded files are tracked using a manifest containing download status, source URL, file path, and SHA-256 hash where applicable.
+- Original source documents are preserved separately from processed data.
+- Raw PDFs are excluded from version control.
 
+## Future Scope
 
-*Collected files will be tracked using a manifest containing download*
+The expanded corpus target includes NFHS-4 and NFHS-5:
 
-*status, source URL, file path, and SHA-256 hash where applicable.*
+- National reports
+- State reports
+- State fact sheets
+- District fact sheets
 
-
-
-*Original source documents will be preserved separately from processed*
-
-*data.*
-
-
-
-*## Future Scope*
-
-
-
-*The expanded corpus target includes NFHS-4 and NFHS-5:*
-
-
-
-*- National reports*
-
-*- State reports*
-
-*- State fact sheets*
-
-*- District fact sheets*
-
-
-
-*The expanded corpus may contain 10,000+ pages. This is an estimate*
-
-*and will be refined after measuring actual downloaded documents.*
+The expanded corpus may contain 10,000+ pages. This is an estimate and will be refined after measuring actual downloaded documents.
