@@ -1,4 +1,4 @@
-# Engineering notes: NFHS Navigator
+﻿# Engineering notes: NFHS Navigator
 
 ## D03 · PostgreSQL
 
@@ -188,3 +188,117 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 - Acquire additional permitted NFHS source documents as available.
 - Refine expanded corpus capacity estimates as more documents are collected.
 - Individual fact-sheet PDF sizes have not yet been measured separately.
+
+
+
+## D07 - Parsing and corpus ingestion
+
+### First parsing run
+
+- Fixed manifest path resolution in scripts/parse_corpus.py.
+- Manifest paths are relative to data/, while downloaded files exist under data/raw/.
+- Added corpus_path() to resolve actual file paths without changing stored manifest paths.
+- Verified downloaded files discovered: 2.
+- First parsing run: 2 files parsed, 897 pages stored.
+- Parsing runtime: 168.0 seconds.
+- PyMuPDF emitted an optional pymupdf_layout suggestion; no installation required.
+
+### Content quality inspection
+
+- Document title extraction verified: National Family Health Survey.
+- Page text and heading paths were successfully stored.
+- Some table content was readable.
+- Continuation headings such as Continued... appear in heading paths.
+- Some pages contain footer/contact information and unwanted text.
+- Garbled characters were observed in extracted text, likely related to font encoding.
+- Legacy Tamil fonts may require OCR or a Unicode source for better text extraction.
+
+### Corpus status after first parse
+
+- Downloaded files available locally: 2 PDFs.
+- Parsed documents: 2.
+- Pages extracted: 897.
+- Parse failures observed in the first run: none.
+- Parser works for the initial corpus; text cleanup and heading refinement remain future work.
+
+### Parse failures and repeat-run verification
+
+- Ran the parser twice against the current corpus.
+- Second run skipped both previously parsed files.
+- Second run inserted 0 new pages.
+- Verified parse_failures table: 0 failure records.
+- Current corpus parse failures: 0 out of 2 files.
+- No retry-failed run was necessary.
+
+## D07 - Expanded NFHS corpus ingestion
+
+### Corpus expansion
+
+- Expanded the local PDF corpus from 2 to 10 documents.
+- Added 8 NFHS-5 state reports: Arunachal Pradesh, Assam, Delhi, Goa, Gujarat, Madhya Pradesh, Maharashtra, and Manipur.
+- Verified PDF signatures, readability, manifest hashes, and file sizes for all 10 documents.
+- Total corpus size: 49,730,324 bytes (approximately 47.4 MiB).
+- Total pages across the 10 PDFs: 2,503.
+
+### Expanded parsing verification
+
+- First expanded parsing run: 2 files already parsed, 8 newly parsed.
+- Newly extracted pages: 1,606.
+- Parsing runtime: 218.2 seconds.
+- Repeat run: all 10 files already parsed; 0 new pages.
+- Repeat-run runtime: 1.1 seconds.
+- No parsing errors were reported in either run.
+- Corpus parsing is repeatable and skips previously parsed documents.
+
+
+### Final failure audit
+
+- Queried PostgreSQL \parse_failures\ directly after the expanded corpus run.
+- Result: 0 parsing failures out of 10 documents.
+- No \--retry-failed\ run was necessary.
+- Day 4 parsing and failure-audit checklist completed.
+
+## D07 · Parser comparison
+
+<!-- parsers:start -->
+| File | Parsers (A / B) | Pages | A found | B found | Time (A / B) | Better, why |
+|---|---|---|---|---|---|---|
+| national-family-health-survey-nfhs-6-2023-2024-f | PyMuPDF / pypdf | 182 | 1,744,457 chars, 349 headings, 183 tables | 543,767 chars, 0 headings, 0 tables | 70.74 s / 21.43 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr375-a059d415.pdf | PyMuPDF / pypdf | 715 | 1,510,511 chars, 1659 headings, 165 tables | 2,763,016 chars, 0 headings, 0 tables | 68.12 s / 100.45 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-arunachalpradesh-7bd9dee4.pdf | PyMuPDF / pypdf | 200 | 427,709 chars, 404 headings, 14 tables | 839,517 chars, 0 headings, 0 tables | 19.14 s / 25.79 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-manipur-1337b41f.pdf | PyMuPDF / pypdf | 198 | 408,216 chars, 344 headings, 17 tables | 790,552 chars, 0 headings, 0 tables | 18.06 s / 22.76 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-assam-e9606422.pdf | PyMuPDF / pypdf | 200 | 432,184 chars, 425 headings, 25 tables | 816,894 chars, 0 headings, 0 tables | 19.27 s / 25.09 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-madhyapradesh-1d9acdff.pdf | PyMuPDF / pypdf | 206 | 447,095 chars, 525 headings, 19 tables | 829,656 chars, 0 headings, 0 tables | 22.13 s / 23.03 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-delhi-f1b5988e.pdf | PyMuPDF / pypdf | 206 | 411,541 chars, 367 headings, 14 tables | 804,785 chars, 0 headings, 0 tables | 17.66 s / 24.40 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-maharashtra-5f247407.pdf | PyMuPDF / pypdf | 204 | 437,097 chars, 481 headings, 15 tables | 438,012 chars, 0 headings, 0 tables | 19.32 s / 6.82 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-gujarat-0a0b1d93.pdf | PyMuPDF / pypdf | 210 | 436,917 chars, 435 headings, 22 tables | 439,096 chars, 0 headings, 0 tables | 18.91 s / 6.37 s | PyMuPDF detected headings/tables; pypdf detected none |
+| fr374-goa-3c688307.pdf | PyMuPDF / pypdf | 182 | 345,332 chars, 320 headings, 12 tables | 347,855 chars, 0 headings, 0 tables | 15.10 s / 5.74 s | PyMuPDF detected headings/tables; pypdf detected none |
+<!-- parsers:end -->
+
+## D07 · Parsing my corpus
+
+- Files in manifest: 11 · downloaded: 10 · blocked: 1 · parsed: 10 · failed: 0 · pages in PostgreSQL: 2,503
+- Parsing coverage: 100% of downloaded files (10/10). The blocked manifest entry is excluded.
+
+### Failures by reason
+
+| Reason | Files | What I did |
+|---|---:|---|
+| None | 0 | No parsing failures; no retry required |
+
+- The one I fixed: manifest paths were not resolved correctly; fixed with `corpus_path()` in `scripts/parse_corpus.py`, resolving paths relative to `data/`.
+
+### What I saw when I read my parsed pages
+
+- A page where the heading path is right: Gujarat report, page 17 — `FERTILITY` → `Age at first marriage` → `Fertility levels`.
+- Something that came out wrong: Madhya Pradesh report, page 65 — heading metadata refers to domestic/sexual violence, but the page text is a fertility table.
+- A table: Madhya Pradesh report, page 66 — Table 19 was extracted as loose text rather than a Markdown grid.
+
+### My parser choice
+
+- For PDFs I use PyMuPDF because the comparison detected headings and tables in all 10 PDFs (2,503 pages); pypdf detected 0 headings and 0 tables across the same files.
+- Chart-heavy pages, formula-heavy content, and some poorly encoded PDF text remain difficult for both parsers.
+
+### One thing that went wrong today, and how I fixed it
+
+- The manifest had 11 entries, which initially made parsing coverage appear to be 90.9%. One entry was blocked, not a downloadable PDF. I corrected the audit to measure coverage against the 10 downloaded files, giving 100% (10/10).
