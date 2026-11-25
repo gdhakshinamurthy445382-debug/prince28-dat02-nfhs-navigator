@@ -416,6 +416,14 @@ class Downloader:
                         if size == 0:
                             raise DownloadError("Empty file")
 
+                        if final.suffix.lower() == ".pdf":
+                            # Reject HTML or other non-PDF content.
+                            with temp.open("rb") as handle:
+                                signature = handle.read(5)
+
+                            if signature != b"%PDF-":
+                                raise DownloadError("Invalid PDF signature")
+
                         temp.replace(final)
 
                         record = {

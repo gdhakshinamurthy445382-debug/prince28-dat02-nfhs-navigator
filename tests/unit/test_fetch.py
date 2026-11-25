@@ -470,3 +470,63 @@ def test_download_resumes_from_existing_partial_file(tmp_path, monkeypatch):
     assert record["status"] == "downloaded"
     assert record["bytes"] == len(full_content)
     assert record["sha256"] == hashlib.sha256(full_content).hexdigest()
+
+
+# --------------------------------------------------
+# Invalid file content tests
+# --------------------------------------------------
+
+
+def test_html_response_is_rejected_for_pdf_url(tmp_path, monkeypatch):
+    url = "https://example.com/report.pdf"
+    html_content = b"<!DOCTYPE html><html><body>Blocked</body></html>"
+
+    root = tmp_path / "data"
+    manifest_path = tmp_path / "manifest.jsonl"
+
+    def handler(request):
+        return httpx.Response(
+            200,
+            headers={"Content-Type": "text/html"},
+            content=html_content,
+        )
+
+    async def allow_all(self, client, target_url):
+        return True
+
+    async def no_wait(self, host):
+        return None
+
+    monkeypatch.setattr(Downloader, "allowed", allow_all)
+    monkeypatch.setattr(Downloader, "wait_host", no_wait)
+
+    original_client = httpx.AsyncClient
+
+    def mock_client(*args, **kwargs):
+        kwargs["transport"] = httpx.MockTransport(handler)
+        return original_client(*args, **kwargs)
+
+    monkeypatch.setattr(httpx, "AsyncClient", mock_client)
+
+    source = Source(
+        url=url,
+        source="Example",
+        licence="Test",
+        title="HTML rejection test",
+    )
+
+    downloader = Downloader(
+        root=root,
+        manifest=manifest_path,
+        delay=0,
+        max_retries=0,
+    )
+
+    asyncio.run(downloader.run([source]))
+
+    final_file = root / "raw" / f"{file_stem(url)}.pdf"
+
+    record = downloader.manifest.records[url]
+
+    assert record["status"] == "error"
+    assert not final_file.exists()
