@@ -9,8 +9,10 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from nfhs_navigator.config import Settings
+from nfhs_navigator.db.llm_calls import UsageRepository
 from nfhs_navigator.db.repository import DocumentRepository
 from nfhs_navigator.indicator_store import IndicatorStore
+from nfhs_navigator.llm.gateway import LLMGateway
 
 
 def get_app_settings(request: Request) -> Settings:
@@ -18,7 +20,6 @@ def get_app_settings(request: Request) -> Settings:
 
 
 def get_indicator_store(request: Request) -> IndicatorStore:
-    """Return the application-wide indicator store."""
     return request.app.state.indicator_store
 
 
@@ -42,6 +43,16 @@ async def check_db(request: Request) -> bool:
         return False
 
 
+def get_gateway(request: Request) -> LLMGateway:
+    return request.app.state.gateway
+
+
+async def get_usage_repo(session: Annotated[AsyncSession, Depends(get_session)]) -> UsageRepository:
+    return UsageRepository(session)
+
+
 SettingsDep = Annotated[Settings, Depends(get_app_settings)]
+GatewayDep = Annotated[LLMGateway, Depends(get_gateway)]
+UsageDep = Annotated[UsageRepository, Depends(get_usage_repo)]
 RepoDep = Annotated[DocumentRepository, Depends(get_repo)]
 DbCheckDep = Annotated[bool, Depends(check_db)]
