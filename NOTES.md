@@ -302,3 +302,59 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 ### One thing that went wrong today, and how I fixed it
 
 - The manifest had 11 entries, which initially made parsing coverage appear to be 90.9%. One entry was blocked, not a downloadable PDF. I corrected the audit to measure coverage against the 10 downloaded files, giving 100% (10/10).
+
+
+## D08 · LLM gateway
+
+### Gateway and configuration
+- Primary provider: Gemini, model `gemini-3.5-flash-lite`.
+- Fallback provider: Groq, model `openai/gpt-oss-20b`.
+- Provider mode: `auto`; Groq-only mode is also configurable.
+- Added `/v1/chat` streaming endpoint and LLM usage logging in `llm_calls`.
+- Added `scripts/ask.py` and `scripts/llm_ping.py`.
+- System prompt stored at `prompts/chat_system_v1.md`.
+- Dockerfile copies prompts into `/app/prompts`.
+- API keys configured in local `.env` and Render environment; `.env` is Git-ignored.
+
+### Validation
+- Unit and integration tests: 94 passed.
+- Alembic: one head, `aa046f38c1e5`.
+- Docker image `nfhs-navigator:day08` built successfully.
+- Verified `/app/prompts/chat_system_v1.md` inside the Docker image.
+- Docker warning: duplicate `builder` stage name; build succeeded, warning not fixed.
+
+### Tokens: English against Tamil
+| Message | tokens in |
+|---|---:|
+| "Hi" (baseline, mostly system prompt) | 170 |
+| English refund question | 178 (8 message tokens) |
+| Same refund question in Tamil | 186 (16 message tokens) |
+
+- Tamil message used approximately 2x the message tokens of English.
+
+### What the model does without my documents
+- NFHS-6 future question: acknowledged uncertainty.
+- Off-topic Cricket World Cup question: rejected as off-topic.
+- Tamil Nadu stunting under 5, NFHS-5: answered 25.0%, matching the verified figure.
+- Tamil Nadu anemia among women 15–49: answered 57%; verified figure 53.4%, a difference of 3.6 percentage points. Possible confusion with child anemia; answer needs correction.
+
+### Fallback and circuit breaker
+- With Gemini intentionally broken, requests successfully fell back to Groq.
+- Database showed Gemini 404 failures and successful Groq fallback calls.
+- Circuit-breaker skip and half-open recovery behavior were not fully verified from logs.
+
+### The bill
+- Observed 15 usage rows: 11 Gemini calls and 4 Groq calls.
+- Combined estimated cost: Rs 0.206534.
+- Groq fallback cost for 4 calls: Rs 0.031635.
+- Final live `/v1/usage` bill: pending.
+
+### Docker and deployment
+- Docker build succeeded after starting Docker Desktop.
+- Prompt file verified inside image.
+- Render API keys configured.
+- Live deployment test, streaming latency and live usage verification: pending.
+
+### One thing that went wrong today, and how I fixed it
+- Docker initially failed because the Docker engine was not running. Started Docker Desktop, verified the engine, and rebuilt successfully.
+- Duplicate Docker build stages produce a warning; deferred cleanup.
