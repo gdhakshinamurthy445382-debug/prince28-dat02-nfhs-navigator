@@ -358,3 +358,40 @@ The largest application-specific Docker layer is 96.3 MB, created by COPY --chow
 ### One thing that went wrong today, and how I fixed it
 - Docker initially failed because the Docker engine was not running. Started Docker Desktop, verified the engine, and rebuilt successfully.
 - Duplicate Docker build stages produce a warning; deferred cleanup.
+
+## D09 · Prompt versions compared
+
+<!-- prompts:start -->
+
+| Prompt version | Correct | Accuracy | Invalid replies | Avg tokens in |
+
+|---|---|---|---|---|
+
+| classify_v1 | 12/20 | 60% | 0 | 116 |
+
+| classify_v2 | 20/20 | 100% | 0 | 279 |
+
+| classify_v3 | 20/20 | 100% | 0 | 414 |
+
+| classify_v4 | 20/20 | 100% | 0 | 432 |
+
+<!-- prompts:end -->
+
+### D09 · Prompts and structured output
+- My best router prompt: classify_v4 with 20 / 20 (100%)
+- What I changed in v4, and what happened to the score: Tightened the definition of personal; score stayed 20/20 (100%).
+- The question my best version still gets wrong (line, wanted, got), and why I think so: None for v2, v3, or v4 on this 20-question test set.
+- A label in my test set that I changed after seeing the results (or "none"): None.
+- Input tokens per question: v1 116, best version (v4) 432. Is the extra accuracy worth it? Both v2 and v4 score 100%, so v4 shows no measured accuracy gain on this test set while using more input tokens.
+### My contract (DocMeta)
+- Fields I kept from my project card: [confirm final DocMeta fields].
+- Fields I deleted, and why they make no sense per document: [confirm fields deleted].
+- The field I tightened, and how: [confirm field and constraint].
+### Extraction run
+- Prompt version: extract_v2 · documents: 10 ok, 0 repaired, 0 failed (of 10 parsed).
+- Not finished? Why, and how many are left: Finished; 0 left.
+- Most common failure reason, and what I did about it: None; no failures were recorded, so no retry was needed.
+- A record that was valid but wrong (document, field, what it said, what is true): [fill from the record you manually checked; not yet confirmed].
+- Cost at list price: Rs 0.2454 in total, Rs 0.02454 per document (approximately Rs 0.0245).
+### One thing that went wrong today, and how I fixed it
+- Router v1 missed 8 questions; adding clearer prompt definitions/examples in v2/v3 brought the test score to 20/20, and tightening the personal definition in v4 kept it at 20/20.
