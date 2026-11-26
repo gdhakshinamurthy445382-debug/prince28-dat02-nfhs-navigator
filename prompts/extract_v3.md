@@ -47,3 +47,6 @@ What each field means:
 \- area: every "area" this document is mainly about.
 
 \- value: every "value" this document is mainly about.
+
+- doc_kind: what kind of document this is.
+- indicator_no: every indicator number this document is mainly about.
