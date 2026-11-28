@@ -584,3 +584,154 @@ def fetch_manual(
 
     print(f"REGISTERED {final} ({size} bytes)")
     return record
+
+
+# --- Worker downloader compatibility layer (Day 10) ---
+
+
+class HostGate:
+    """Rate-limit requests per host for the worker."""
+
+    def __init__(self, delay: float = 0.5, sleep=asyncio.sleep):
+        self.delay = max(0.0, delay)
+        self.sleep = sleep
+        self.last = {}
+        self.locks = {}
+
+    async def wait(self, host: str):
+        lock = self.locks.setdefault(host, asyncio.Lock())
+        async with lock:
+            elapsed = time.monotonic() - self.last.get(host, 0)
+            if elapsed < self.delay:
+                await self.sleep(self.delay - elapsed)
+            self.last[host] = time.monotonic()
+
+
+class Robots:
+    """Small robots.txt checker used by individual worker jobs."""
+
+    def __init__(self, client):
+        self.client = client
+        self.cache = {}
+        self.locks = {}
+
+    async def allowed(self, url: str) -> bool:
+        parts = urlsplit(url)
+        origin = f"{parts.scheme}://{parts.netloc}"
+
+        if origin not in self.cache:
+            lock = self.locks.setdefault(origin, asyncio.Lock())
+            async with lock:
+                if origin not in self.cache:
+                    try:
+                        response = await self.client.get(f"{origin}/robots.txt")
+                        if response.status_code in (401, 403):
+                            parser = Protego.parse("User-agent: *\nDisallow: /\n")
+                        elif response.status_code == 404:
+                            parser = Protego.parse("")
+                        elif response.status_code >= 400:
+                            parser = Protego.parse("User-agent: *\nDisallow: /\n")
+                        else:
+                            parser = Protego.parse(response.text)
+                    except httpx.HTTPError:
+                        parser = Protego.parse("User-agent: *\nDisallow: /\n")
+                    self.cache[origin] = parser
+
+        return self.cache[origin].can_fetch(url, USER_AGENT)
+
+
+def make_client(max_connections: int = 2) -> httpx.AsyncClient:
+    """Create the HTTP client shared by the worker."""
+    limits = httpx.Limits(
+        max_connections=max(1, max_connections),
+        max_keepalive_connections=max(1, max_connections),
+    )
+    return httpx.AsyncClient(
+        timeout=httpx.Timeout(ATTEMPT_TIMEOUT),
+        limits=limits,
+        headers={"User-Agent": USER_AGENT},
+        follow_redirects=True,
+    )
+
+
+async def fetch_one(
+    client,
+    source,
+    *,
+    root,
+    raw_dir,
+    robots,
+    gate,
+    slots,
+    max_attempts=2,
+    sleep=asyncio.sleep,
+):
+    """Download one document for the ARQ worker and return a manifest-like result."""
+    url = source.url
+    host = urlsplit(url).netloc
+
+    if not await robots.allowed(url):
+        return {
+            "status": "blocked",
+            "error": "robots.txt blocked the URL",
+        }
+
+    async with slots:
+        for attempt in range(max_attempts):
+            try:
+                await gate.wait(host)
+                response = await client.get(url)
+
+                if response.status_code in RETRYABLE:
+                    error = f"HTTP {response.status_code}"
+                    if attempt + 1 < max_attempts:
+                        await sleep(backoff_delay(attempt))
+                        continue
+                    return {
+                        "status": "error",
+                        "http_status": response.status_code,
+                        "error": error,
+                    }
+
+                if response.status_code >= 400:
+                    return {
+                        "status": "error",
+                        "http_status": response.status_code,
+                        "error": f"HTTP {response.status_code}",
+                    }
+
+                content_type = response.headers.get("Content-Type", "application/octet-stream")
+                ext = pick_ext(url, content_type)
+                raw_dir = Path(raw_dir)
+                root = Path(root)
+                raw_dir.mkdir(parents=True, exist_ok=True)
+
+                filename = f"{file_stem(url)}{ext}"
+                final = raw_dir / filename
+                content = response.content
+
+                if not content:
+                    return {"status": "error", "error": "Empty file"}
+
+                if len(content) > MAX_BYTES:
+                    return {"status": "error", "error": "File exceeds size limit"}
+
+                if ext == ".pdf" and not content.startswith(b"%PDF-"):
+                    return {"status": "error", "error": "Invalid PDF signature"}
+
+                final.write_bytes(content)
+                return {
+                    "status": "downloaded",
+                    "path": str(final.relative_to(root)).replace("\\", "/"),
+                    "bytes": len(content),
+                }
+
+            except (httpx.HTTPError, OSError) as error:
+                if attempt + 1 >= max_attempts:
+                    return {
+                        "status": "error",
+                        "error": f"{type(error).__name__}: {error}",
+                    }
+                await sleep(backoff_delay(attempt))
+
+    return {"status": "error", "error": "Download failed"}

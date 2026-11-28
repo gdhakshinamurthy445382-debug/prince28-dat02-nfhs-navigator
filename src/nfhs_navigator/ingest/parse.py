@@ -154,45 +154,53 @@ def _open_pdf(path: Path) -> pymupdf.Document:
     except Exception as exc:  # PyMuPDF raises several error types for broken files
         raise ParseError("corrupt", str(exc)) from exc
     if doc.needs_pass:
+        doc.close()
         raise ParseError("encrypted", "the PDF needs a password")
     if doc.page_count == 0:
+        doc.close()
         raise ParseError("empty", "the PDF has no pages")
     return doc
 
 
 def parse_pdf_pymupdf(path: Path) -> ParsedDoc:
     doc = _open_pdf(path)
-    body = _body_size(doc)
-    texts, chars = [], 0
-    for page in doc:
-        # Looking for tables is slow, so only do it on pages that have ruled lines at all.
-        tables = list(page.find_tables().tables) if len(page.get_cdrawings()) >= 4 else []
-        used: set[int] = set()
-        out: list[str] = []
-        for block in page.get_text("dict")["blocks"]:
-            if block["type"] != 0:
-                continue  # an image
-            rect = pymupdf.Rect(block["bbox"])
-            inside = next((i for i, t in enumerate(tables) if rect.intersects(t.bbox)), None)
-            if inside is not None:
-                if inside not in used:  # write the whole table once, as Markdown
-                    used.add(inside)
-                    out.append("\n" + tables[inside].to_markdown().strip() + "\n")
-                continue
-            for line in block["lines"]:
-                text = "".join(span["text"] for span in line["spans"]).strip()
-                if not text:
+    try:
+        body = _body_size(doc)
+        texts, chars = [], 0
+        for page in doc:
+            # Looking for tables is slow, so only do it on pages that have ruled lines at all.
+            tables = list(page.find_tables().tables) if len(page.get_cdrawings()) >= 4 else []
+            used: set[int] = set()
+            out: list[str] = []
+            for block in page.get_text("dict")["blocks"]:
+                if block["type"] != 0:
+                    continue  # an image
+                rect = pymupdf.Rect(block["bbox"])
+                inside = next((i for i, t in enumerate(tables) if rect.intersects(t.bbox)), None)
+                if inside is not None:
+                    if inside not in used:  # write the whole table once, as Markdown
+                        used.add(inside)
+                        out.append("\n" + tables[inside].to_markdown().strip() + "\n")
                     continue
-                size = max(span["size"] for span in line["spans"])
-                bold = all(span["flags"] & 16 for span in line["spans"])
-                level = _heading_level(text, size, bold, body)
-                out.append(f"{'#' * level} {text}" if level else text)
-                chars += len(text)
-            out.append("")  # blank line between blocks
-        texts.append("\n".join(out))
-    if chars < MIN_CHARS_PER_PAGE * len(texts):
-        raise ParseError("no_text_layer", f"{chars} characters on {len(texts)} pages: needs OCR")
-    return finish("pymupdf", "pdf", (doc.metadata or {}).get("title") or "", texts)
+                for line in block["lines"]:
+                    text = "".join(span["text"] for span in line["spans"]).strip()
+                    if not text:
+                        continue
+                    size = max(span["size"] for span in line["spans"])
+                    bold = all(span["flags"] & 16 for span in line["spans"])
+                    level = _heading_level(text, size, bold, body)
+                    out.append(f"{'#' * level} {text}" if level else text)
+                    chars += len(text)
+                out.append("")  # blank line between blocks
+            texts.append("\n".join(out))
+        if chars < MIN_CHARS_PER_PAGE * len(texts):
+            raise ParseError(
+                "no_text_layer",
+                f"{chars} characters on {len(texts)} pages: needs OCR",
+            )
+        return finish("pymupdf", "pdf", (doc.metadata or {}).get("title") or "", texts)
+    finally:
+        doc.close()
 
 
 def parse_pdf_ocr(path: Path, language: str = "eng") -> ParsedDoc:
@@ -203,9 +211,11 @@ def parse_pdf_ocr(path: Path, language: str = "eng") -> ParsedDoc:
             page.get_text(textpage=page.get_textpage_ocr(language=language, dpi=200, full=True))
             for page in doc
         ]
+        return finish(f"ocr-{language}", "pdf", "", texts)
     except Exception as exc:  # Tesseract or its language file is missing
         raise ParseError("ocr_unavailable", str(exc)) from exc
-    return finish(f"ocr-{language}", "pdf", "", texts)
+    finally:
+        doc.close()
 
 
 # ---------- PDF, parser 2: pypdf (pure Python, text only) ----------
