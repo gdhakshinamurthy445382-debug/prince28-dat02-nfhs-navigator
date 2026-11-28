@@ -1,13 +1,14 @@
 """App factory: build a fully wired FastAPI app from settings."""
 
+import asyncio
 import logging
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import APIRouter, FastAPI
 
 from nfhs_navigator.api.errors import register_error_handlers
 from nfhs_navigator.api.middleware import request_context
-from nfhs_navigator.api.routes import chat, documents, health, indicators
+from nfhs_navigator.api.routes import chat, documents, health, indicators, ingest
 from nfhs_navigator.config import Settings, get_settings
 from nfhs_navigator.db.llm_calls import make_recorder
 from nfhs_navigator.db.session import make_engine, make_sessionmaker
@@ -26,16 +27,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         logger.info("starting", extra={"status": settings.app_env})
+        worker = None
+        if settings.worker_in_api:  # no separate worker service here: run one in this process
+            from nfhs_navigator.workers.main import run_embedded  # imported late: it reads .env
+
+            worker = asyncio.create_task(run_embedded(settings))
         yield
+        if worker:
+            worker.cancel()
+            with suppress(asyncio.CancelledError):
+                await worker
+        if getattr(app.state, "queue", None):
+            await app.state.queue.close()
         await engine.dispose()  # close every pooled connection on shutdown
 
     app = FastAPI(title=settings.app_name, version="0.2.0", lifespan=lifespan)
     app.state.settings = settings
     app.state.engine = engine
     app.state.sessionmaker = make_sessionmaker(engine)
-    indicator_store = IndicatorStore(settings.indicator_data_file)
-    indicator_store.load()
-    app.state.indicator_store = indicator_store
+    app.state.indicator_store = IndicatorStore(settings.indicator_data_file)
+    app.state.indicator_store.load()
     app.state.system_prompt = chat.load_prompt(settings.prompts_dir)  # missing file: no start
     app.state.gateway = build_gateway(settings, make_recorder(app.state.sessionmaker))
 
@@ -44,8 +55,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     v1 = APIRouter(prefix="/v1")
     v1.include_router(documents.router)
-    v1.include_router(indicators.router)
     v1.include_router(chat.router)
+    v1.include_router(indicators.router)
+    v1.include_router(ingest.router)
     app.include_router(health.router)
     app.include_router(v1)
     return app
